@@ -10,7 +10,6 @@ namespace Com.MyCompany.MyGame.Editor
     {
         static FixMissingNetworkTransform()
         {
-            // Delay the execution to ensure AssetDatabase is ready
             EditorApplication.delayCall += CheckAndFixPlayerPrefab;
         }
 
@@ -25,28 +24,22 @@ namespace Com.MyCompany.MyGame.Editor
                 return;
             }
 
-            // Check if NetworkTransform is already missing
             if (prefab.GetComponent<NetworkTransform>() == null)
             {
                 Debug.Log($"[FixMissingNetworkTransform] NetworkTransform missing on {prefab.name}. Adding it now...");
-                
-                // Add the component
+
                 prefab.AddComponent<NetworkTransform>();
-                
-                // Mark object as dirty to ensure save
+
                 EditorUtility.SetDirty(prefab);
-                
-                // Save the asset
-                AssetDatabase.SaveAssets(); // Use SaveAssets to write changes to disk
-                AssetDatabase.Refresh(); // Refresh to ensure Unity picks up the change
+
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
                 
                 Debug.Log($"[FixMissingNetworkTransform] Successfully added NetworkTransform to {prefab.name} and saved.");
             }
             else
             {
-                // Component already exists, no action needed.
-                // Commenting out to avoid spamming console on every recompile
-                // Debug.Log($"[FixMissingNetworkTransform] {prefab.name} already has NetworkTransform.");
+
             }
         }
     }
