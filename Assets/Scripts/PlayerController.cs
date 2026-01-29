@@ -99,9 +99,32 @@ namespace Com.MyCompany.MyGame
                 Vector3 inputDir = new Vector3(data.direction.x, 0, data.direction.y);
                 Vector3 moveDir = cameraRotation * inputDir;
                 
-                // Apply Movement
+                // Apply Movement Speed
                 Vector3 moveDelta = moveDir * moveSpeed * Runner.DeltaTime;
+
+                // --- GRAVITY & GROUND CHECK ---
+                // Simple Gravity: If we are above ground (Y > 0), pull down.
+                // Assuming pivot is at center (Y=1) or bottom (Y=0). 
+                // Let's assume standard capsule: Height 2, Center Y=1. 
+                // So "Ground" is when position.y = 1 (if pivot center) or 0 (if pivot bottom).
+                
+                // Usually Unity primitives have pivot at Center. So Y=1 is "On Ground".
+                // But the user screenshot shows them floating high.
+                // We will use a Raycast to be sure, or just add gravity until we hit something.
+                
+                moveDelta.y += -9.81f * Runner.DeltaTime; 
+                
+                // Apply Move
                 transform.position += moveDelta;
+
+                // Simple Floor Clamp (Hardcoded for flat prototype floor at Y=0)
+                // Adjust this threshold based on your actual object pivot
+                // If using a Capsule(Height 2), Center is 1 unit up.
+                float groundY = 1.0f; 
+                if (transform.position.y < groundY)
+                {
+                    transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                }
                 
                 // Rotate Player to Face Movement
                 if (moveDir.sqrMagnitude > 0.01f)

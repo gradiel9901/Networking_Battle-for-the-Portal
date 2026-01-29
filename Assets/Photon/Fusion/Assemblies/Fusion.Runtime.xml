@@ -1470,56 +1470,6 @@
             </summary>
             <returns>Formatted <see cref="T:Fusion.SessionInfo"/></returns>
         </member>
-        <member name="T:Fusion.IAfterAllTicks">
-            <summary>
-            Interface for <see cref="M:Fusion.IAfterAllTicks.AfterAllTicks(System.Boolean,System.Int32)"/> callback. 
-            Called after the re-simulation loop (when applicable), and also after the forward simulation loop.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterAllTicks.AfterAllTicks(System.Boolean,System.Int32)">
-            <summary>
-            Called after the re-simulation loop (when applicable), and also after the forward simulation loop.
-            Only called on Updates where re-simulation or forward ticks are processed.
-            </summary>
-            <param name="resimulation">True if this is being called during the re-simulation loop. False if during the forward simulation loop.</param>
-            <param name="tickCount">How many re-simulation or forward ticks are going to be processed.</param>
-        </member>
-        <member name="T:Fusion.IAfterClientPredictionReset">
-            <summary>
-            Callback interface for <see cref="M:Fusion.IAfterClientPredictionReset.AfterClientPredictionReset"/>.
-            Called at the very start of the resimulation loop (on clients with prediction enabled), 
-            immediately after state is set to the latest server snapshot.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterClientPredictionReset.AfterClientPredictionReset">
-            <summary>
-            Called at the very start of the resimulation loop (on clients with prediction enabled), 
-            immediately after state is set to the latest server snapshot.
-            </summary>
-        </member>
-        <member name="T:Fusion.IAfterHostMigration">
-            <summary>
-            Used to mark NetworkBehaviors that need to be react after a Host Migration process
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterHostMigration.AfterHostMigration">
-            <summary>
-            Invoked after the Host Migration happens in order to setup non-networked data on NetworkBehaviors
-            </summary>
-        </member>
-        <member name="T:Fusion.IAfterRender">
-            <summary>
-            Interface for <see cref="M:Fusion.IAfterRender.AfterRender"/> callback.
-            Called after the render loop.
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterRender.AfterRender">
-            <summary>
-            Called after the render loop.
-            </summary>
-        </member>
         <member name="T:Fusion.IAfterSpawned">
             <summary>
             Interface for <see cref="M:Fusion.IAfterSpawned.AfterSpawned"/> callback.
@@ -1529,137 +1479,6 @@
         <member name="M:Fusion.IAfterSpawned.AfterSpawned">
             <summary>
             Called after the object is spawned.
-            </summary>
-        </member>
-        <member name="T:Fusion.IAfterTick">
-            <summary>
-            Interface for <see cref="M:Fusion.IAfterTick.AfterTick"/> callback. 
-            Called after each tick simulation completes.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterTick.AfterTick">
-            <summary>
-            Called after each tick simulation completes.
-            </summary>
-        </member>
-        <member name="T:Fusion.IAfterUpdate">
-            <summary>
-            Interface for the <see cref="M:Fusion.IAfterUpdate.AfterUpdate"/> callback, which is called at the end of each Fusion Update segment. 
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterUpdate.AfterUpdate">
-            <summary>
-            Called at the end of the Fusion Update loop, before all Unity MonoBehaviour.Update() callbacks.
-            </summary>
-        </member>
-        <member name="T:Fusion.IAfterUpdateRemotePrefabs">
-            <summary>
-            Invoked after updating remote prefabs
-            </summary>
-        </member>
-        <member name="M:Fusion.IAfterUpdateRemotePrefabs.AfterUpdateRemotePrefabs">
-            <summary>
-            Invoked after updating remote prefabs
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeAllTicks">
-            <summary>
-            Interface for <see cref="M:Fusion.IBeforeAllTicks.BeforeAllTicks(System.Boolean,System.Int32)"/> callback. 
-            Called before the re-simulation loop (when applicable), and also before the forward simulation loop.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeAllTicks.BeforeAllTicks(System.Boolean,System.Int32)">
-            <summary>
-            Called before the re-simulation loop (when applicable), and also before the forward simulation loop. 
-            Only called on Updates where re-simulation or forward ticks are processed.
-            </summary>
-            <param name="resimulation">True if this is being called during the re-simulation loop. False if during the forward simulation loop.</param>
-            <param name="tickCount">How many re-simulation or forward ticks are going to be processed.</param>
-        </member>
-        <member name="T:Fusion.IBeforeClientPredictionReset">
-            <summary>
-            Callback interface for <see cref="M:Fusion.IBeforeClientPredictionReset.BeforeClientPredictionReset"/>.
-            Called at the very start of the re-simulation loop (on clients with prediction enabled), 
-            before state is set to the latest server snapshot.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeClientPredictionReset.BeforeClientPredictionReset">
-            <summary>
-            Called at the very start of the re-simulation loop (on clients with prediction enabled), 
-            before state is set to the latest server snapshot.
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeCopyPreviousState">
-            <summary>
-            Interface for <see cref="M:Fusion.IBeforeCopyPreviousState.BeforeCopyPreviousState"/> callback.
-            Called before the copy of the previous state.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeCopyPreviousState.BeforeCopyPreviousState">
-            <summary>
-            Called before the copy of the previous state.
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeHitboxRegistration">
-            <summary>
-            Interface for <see cref="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration"/> callback.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration">
-            <summary>
-            Called immediately before the <see cref="T:Fusion.HitboxManager"/> registers hitboxes in a snapshot.
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeSimulation">
-            <summary>
-            Interface for <see cref="M:Fusion.IBeforeSimulation.BeforeSimulation(System.Int32)"/> callback. 
-            Called before both the re-simulation (when applicable) and forward simulation loops.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeSimulation.BeforeSimulation(System.Int32)">
-            <summary>
-            Called before both the re-simulation (when applicable) and forward simulation loops.
-            Only called on updates that have forward ticks to process.
-            </summary>
-            <param name="forwardTickCount">How many forward ticks are going to be processed.</param>
-        </member>
-        <member name="T:Fusion.IBeforeTick">
-            <summary>
-            Interface for <see cref="M:Fusion.IBeforeTick.BeforeTick"/> callback. 
-            Called before each tick is simulated.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeTick.BeforeTick">
-            <summary>
-            Called before each tick is simulated.
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeUpdate">
-            <summary>
-            Interface for the <see cref="M:Fusion.IBeforeUpdate.BeforeUpdate"/> callback, which is called at the beginning of each Fusion Update segment. 
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeUpdate.BeforeUpdate">
-            <summary>
-            Called at the start of the Fusion Update loop, before the Fusion simulation loop.
-            </summary>
-        </member>
-        <member name="T:Fusion.IBeforeUpdateRemotePrefabs">
-            <summary>
-            Invoked before updating remote prefabs
-            </summary>
-        </member>
-        <member name="M:Fusion.IBeforeUpdateRemotePrefabs.BeforeUpdateRemotePrefabs">
-            <summary>
-            Invoked before updating remote prefabs
             </summary>
         </member>
         <member name="T:Fusion.IDespawned">
@@ -1674,6 +1493,16 @@
             </summary>
             <param name="runner">NetworkRunner that despawned the <see cref="T:Fusion.NetworkBehaviour"/>.</param>
             <param name="hasState">Whether the <see cref="T:Fusion.NetworkBehaviour"/> has state.</param>
+        </member>
+        <member name="T:Fusion.ISpawned">
+            <summary>
+            Interface for handling the event when an object is spawned.
+            </summary>
+        </member>
+        <member name="M:Fusion.ISpawned.Spawned">
+            <summary>
+            Method to be called when an object is spawned.
+            </summary>
         </member>
         <member name="T:Fusion.IInterestEnter">
             <summary>
@@ -1707,6 +1536,201 @@
             Method to be called when a local prefab is created.
             </summary>
         </member>
+        <member name="T:Fusion.IRemotePrefabCreated">
+            <summary>
+            Interface for handling the event when a remote prefab is created.
+            </summary>
+        </member>
+        <member name="M:Fusion.IRemotePrefabCreated.RemotePrefabCreated">
+            <summary>
+            Method to be called when a remote prefab is created.
+            </summary>
+        </member>
+        <member name="T:Fusion.ISimulationEnter">
+            <summary>
+            Interface for <see cref="M:Fusion.ISimulationEnter.SimulationEnter"/> callback.
+            Called when the <see cref="T:Fusion.NetworkObject"/> joins AreaOfInterest.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.ISimulationEnter.SimulationEnter">
+            <summary>
+            Called when the <see cref="T:Fusion.NetworkObject"/> joins AreaOfInterest.
+            Object is now receiving snapshot updates.
+            Object will execute <see cref="T:Fusion.NetworkBehaviour"/> FixedUpdateNetwork() and Render() methods until the object leaves simulation.
+            </summary>
+        </member>
+        <member name="T:Fusion.ISimulationExit">
+            <summary>
+            Interface for the <see cref="M:Fusion.ISimulationExit.SimulationExit"/> callback.
+            Called when the <see cref="T:Fusion.NetworkObject"/> leaves AreaOfInterest. 
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.ISimulationExit.SimulationExit">
+            <summary>
+            Called when the <see cref="T:Fusion.NetworkObject"/> leaves AreaOfInterest. 
+            Object is no longer receiving snapshot updates.
+            Object will stop executing <see cref="T:Fusion.NetworkBehaviour"/> FixedUpdateNetwork() and Render() methods until the object rejoins simulation.
+            </summary>
+        </member>
+        <member name="T:Fusion.IStateAuthorityChanged">
+            <summary>
+            Interface for handling the event when the state authority changes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IStateAuthorityChanged.StateAuthorityChanged">
+            <summary>
+            Method to be called when the state authority changes.
+            </summary>
+        </member>
+        <member name="T:Fusion.IInputAuthorityGained">
+            <summary>
+            Interface for handling the event when the input authority is gained.
+            </summary>
+        </member>
+        <member name="M:Fusion.IInputAuthorityGained.InputAuthorityGained">
+            <summary>
+            Method to be called when the input authority is gained.
+            </summary>
+        </member>
+        <member name="T:Fusion.IInputAuthorityLost">
+            <summary>
+            Interface for handling the event when the input authority is lost.
+            </summary>
+        </member>
+        <member name="M:Fusion.IInputAuthorityLost.InputAuthorityLost">
+            <summary>
+            Method to be called when the input authority is lost.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeCopyPreviousState">
+            <summary>
+            Interface for <see cref="M:Fusion.IBeforeCopyPreviousState.BeforeCopyPreviousState"/> callback.
+            Called before the copy of the previous state.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeCopyPreviousState.BeforeCopyPreviousState">
+            <summary>
+            Called before the copy of the previous state.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeClientPredictionReset">
+            <summary>
+            Callback interface for <see cref="M:Fusion.IBeforeClientPredictionReset.BeforeClientPredictionReset"/>.
+            Called at the very start of the re-simulation loop (on clients with prediction enabled), 
+            before state is set to the latest server snapshot.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeClientPredictionReset.BeforeClientPredictionReset">
+            <summary>
+            Called at the very start of the re-simulation loop (on clients with prediction enabled), 
+            before state is set to the latest server snapshot.
+            </summary>
+        </member>
+        <member name="T:Fusion.IAfterClientPredictionReset">
+            <summary>
+            Callback interface for <see cref="M:Fusion.IAfterClientPredictionReset.AfterClientPredictionReset"/>.
+            Called at the very start of the resimulation loop (on clients with prediction enabled), 
+            immediately after state is set to the latest server snapshot.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterClientPredictionReset.AfterClientPredictionReset">
+            <summary>
+            Called at the very start of the resimulation loop (on clients with prediction enabled), 
+            immediately after state is set to the latest server snapshot.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeUpdateRemotePrefabs">
+            <summary>
+            Invoked before updating remote prefabs
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeUpdateRemotePrefabs.BeforeUpdateRemotePrefabs">
+            <summary>
+            Invoked before updating remote prefabs
+            </summary>
+        </member>
+        <member name="T:Fusion.IAfterUpdateRemotePrefabs">
+            <summary>
+            Invoked after updating remote prefabs
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterUpdateRemotePrefabs.AfterUpdateRemotePrefabs">
+            <summary>
+            Invoked after updating remote prefabs
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeTick">
+            <summary>
+            Interface for <see cref="M:Fusion.IBeforeTick.BeforeTick"/> callback. 
+            Called before each tick is simulated.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeTick.BeforeTick">
+            <summary>
+            Called before each tick is simulated.
+            </summary>
+        </member>
+        <member name="T:Fusion.IAfterTick">
+            <summary>
+            Interface for <see cref="M:Fusion.IAfterTick.AfterTick"/> callback. 
+            Called after each tick simulation completes.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterTick.AfterTick">
+            <summary>
+            Called after each tick simulation completes.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeAllTicks">
+            <summary>
+            Interface for <see cref="M:Fusion.IBeforeAllTicks.BeforeAllTicks(System.Boolean,System.Int32)"/> callback. 
+            Called before the re-simulation loop (when applicable), and also before the forward simulation loop.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeAllTicks.BeforeAllTicks(System.Boolean,System.Int32)">
+            <summary>
+            Called before the re-simulation loop (when applicable), and also before the forward simulation loop. 
+            Only called on Updates where re-simulation or forward ticks are processed.
+            </summary>
+            <param name="resimulation">True if this is being called during the re-simulation loop. False if during the forward simulation loop.</param>
+            <param name="tickCount">How many re-simulation or forward ticks are going to be processed.</param>
+        </member>
+        <member name="T:Fusion.IAfterAllTicks">
+            <summary>
+            Interface for <see cref="M:Fusion.IAfterAllTicks.AfterAllTicks(System.Boolean,System.Int32)"/> callback. 
+            Called after the re-simulation loop (when applicable), and also after the forward simulation loop.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterAllTicks.AfterAllTicks(System.Boolean,System.Int32)">
+            <summary>
+            Called after the re-simulation loop (when applicable), and also after the forward simulation loop.
+            Only called on Updates where re-simulation or forward ticks are processed.
+            </summary>
+            <param name="resimulation">True if this is being called during the re-simulation loop. False if during the forward simulation loop.</param>
+            <param name="tickCount">How many re-simulation or forward ticks are going to be processed.</param>
+        </member>
+        <member name="T:Fusion.IBeforeSimulation">
+            <summary>
+            Interface for <see cref="M:Fusion.IBeforeSimulation.BeforeSimulation(System.Int32)"/> callback. 
+            Called before both the re-simulation (when applicable) and forward simulation loops.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeSimulation.BeforeSimulation(System.Int32)">
+            <summary>
+            Called before both the re-simulation (when applicable) and forward simulation loops.
+            Only called on updates that have forward ticks to process.
+            </summary>
+            <param name="forwardTickCount">How many forward ticks are going to be processed.</param>
+        </member>
         <member name="T:Fusion.IPlayerJoined">
             <summary>
             Interface for handling the event when a player joins the game.
@@ -1729,19 +1753,48 @@
             </summary>
             <param name="player">The player who left the game.</param>
         </member>
-        <member name="T:Fusion.IPublicFacingInterface">
+        <member name="T:Fusion.IBeforeHitboxRegistration">
             <summary>
-            Tag Interface for all public facing Fusion interfaces
+            Interface for <see cref="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration"/> callback.
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
             </summary>
         </member>
-        <member name="T:Fusion.IRemotePrefabCreated">
+        <member name="M:Fusion.IBeforeHitboxRegistration.BeforeHitboxRegistration">
             <summary>
-            Interface for handling the event when a remote prefab is created.
+            Called immediately before the <see cref="T:Fusion.HitboxManager"/> registers hitboxes in a snapshot.
             </summary>
         </member>
-        <member name="M:Fusion.IRemotePrefabCreated.RemotePrefabCreated">
+        <member name="T:Fusion.IAfterUpdate">
             <summary>
-            Method to be called when a remote prefab is created.
+            Interface for the <see cref="M:Fusion.IAfterUpdate.AfterUpdate"/> callback, which is called at the end of each Fusion Update segment. 
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterUpdate.AfterUpdate">
+            <summary>
+            Called at the end of the Fusion Update loop, before all Unity MonoBehaviour.Update() callbacks.
+            </summary>
+        </member>
+        <member name="T:Fusion.IBeforeUpdate">
+            <summary>
+            Interface for the <see cref="M:Fusion.IBeforeUpdate.BeforeUpdate"/> callback, which is called at the beginning of each Fusion Update segment. 
+            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
+            </summary>
+        </member>
+        <member name="M:Fusion.IBeforeUpdate.BeforeUpdate">
+            <summary>
+            Called at the start of the Fusion Update loop, before the Fusion simulation loop.
+            </summary>
+        </member>
+        <member name="T:Fusion.IAfterRender">
+            <summary>
+            Interface for <see cref="M:Fusion.IAfterRender.AfterRender"/> callback.
+            Called after the render loop.
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterRender.AfterRender">
+            <summary>
+            Called after the render loop.
             </summary>
         </member>
         <member name="T:Fusion.ISceneLoadDone">
@@ -1754,6 +1807,32 @@
             Method to be called when a scene load operation is completed.
             </summary>
             <param name="sceneInfo">The information about the loaded scene.</param>
+        </member>
+        <member name="T:Fusion.ISceneLoadStart">
+            <summary>
+            Interface for handling the event when a scene load operation is started.
+            </summary>
+        </member>
+        <member name="M:Fusion.ISceneLoadStart.SceneLoadStart(Fusion.SceneRef)">
+            <summary>
+            Method to be called when a scene load operation is started.
+            </summary>
+            <param name="sceneRef">Reference to the scene that is being loaded.</param>
+        </member>
+        <member name="T:Fusion.IAfterHostMigration">
+            <summary>
+            Used to mark NetworkBehaviors that need to be react after a Host Migration process
+            </summary>
+        </member>
+        <member name="M:Fusion.IAfterHostMigration.AfterHostMigration">
+            <summary>
+            Invoked after the Host Migration happens in order to setup non-networked data on NetworkBehaviors
+            </summary>
+        </member>
+        <member name="T:Fusion.IPublicFacingInterface">
+            <summary>
+            Tag Interface for all public facing Fusion interfaces
+            </summary>
         </member>
         <member name="T:Fusion.SceneLoadDoneArgs">
             <summary>
@@ -1788,85 +1867,6 @@
             <param name="sceneObjects">Array of NetworkObjects present in the loaded scene.</param>
             <param name="scene">The loaded Unity scene.</param>
             <param name="rootGameObjects">Array of root GameObjects present in the loaded Unity scene.</param>
-        </member>
-        <member name="T:Fusion.ISceneLoadStart">
-            <summary>
-            Interface for handling the event when a scene load operation is started.
-            </summary>
-        </member>
-        <member name="M:Fusion.ISceneLoadStart.SceneLoadStart(Fusion.SceneRef)">
-            <summary>
-            Method to be called when a scene load operation is started.
-            </summary>
-            <param name="sceneRef">Reference to the scene that is being loaded.</param>
-        </member>
-        <member name="T:Fusion.ISimulationEnter">
-            <summary>
-            Interface for <see cref="M:Fusion.ISimulationEnter.SimulationEnter"/> callback.
-            Called when the <see cref="T:Fusion.NetworkObject"/> joins AreaOfInterest.
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.ISimulationEnter.SimulationEnter">
-            <summary>
-            Called when the <see cref="T:Fusion.NetworkObject"/> joins AreaOfInterest.
-            Object is now receiving snapshot updates.
-            Object will execute <see cref="T:Fusion.NetworkBehaviour"/> FixedUpdateNetwork() and Render() methods until the object leaves simulation.
-            </summary>
-        </member>
-        <member name="T:Fusion.ISimulationExit">
-            <summary>
-            Interface for the <see cref="M:Fusion.ISimulationExit.SimulationExit"/> callback.
-            Called when the <see cref="T:Fusion.NetworkObject"/> leaves AreaOfInterest. 
-            Implement this interface on <see cref="T:Fusion.SimulationBehaviour"/> and <see cref="T:Fusion.NetworkBehaviour"/> classes.
-            </summary>
-        </member>
-        <member name="M:Fusion.ISimulationExit.SimulationExit">
-            <summary>
-            Called when the <see cref="T:Fusion.NetworkObject"/> leaves AreaOfInterest. 
-            Object is no longer receiving snapshot updates.
-            Object will stop executing <see cref="T:Fusion.NetworkBehaviour"/> FixedUpdateNetwork() and Render() methods until the object rejoins simulation.
-            </summary>
-        </member>
-        <member name="T:Fusion.ISpawned">
-            <summary>
-            Interface for handling the event when an object is spawned.
-            </summary>
-        </member>
-        <member name="M:Fusion.ISpawned.Spawned">
-            <summary>
-            Method to be called when an object is spawned.
-            </summary>
-        </member>
-        <member name="T:Fusion.IStateAuthorityChanged">
-            <summary>
-            Interface for handling the event when the state authority changes.
-            </summary>
-        </member>
-        <member name="M:Fusion.IStateAuthorityChanged.StateAuthorityChanged">
-            <summary>
-            Method to be called when the state authority changes.
-            </summary>
-        </member>
-        <member name="T:Fusion.IInputAuthorityGained">
-            <summary>
-            Interface for handling the event when the input authority is gained.
-            </summary>
-        </member>
-        <member name="M:Fusion.IInputAuthorityGained.InputAuthorityGained">
-            <summary>
-            Method to be called when the input authority is gained.
-            </summary>
-        </member>
-        <member name="T:Fusion.IInputAuthorityLost">
-            <summary>
-            Interface for handling the event when the input authority is lost.
-            </summary>
-        </member>
-        <member name="M:Fusion.IInputAuthorityLost.InputAuthorityLost">
-            <summary>
-            Method to be called when the input authority is lost.
-            </summary>
         </member>
         <member name="T:Fusion.IExportedWordCount">
             <summary>

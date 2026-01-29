@@ -25,9 +25,80 @@ namespace Com.MyCompany.MyGame
 
         private void Start()
         {
-            startButton.onClick.AddListener(StartGame);
-            controlPanel.SetActive(true);
-            progressLabel.SetActive(false);
+            // Check if a runner already exists (passed from Main Menu)
+            var existingRunner = FindFirstObjectByType<NetworkRunner>();
+            
+            if (existingRunner != null && existingRunner.IsRunning)
+            {
+                _runner = existingRunner;
+                _runner.AddCallbacks(this);
+                
+                // We are already connected. 
+                // Show UI but make the button just "Spawn" us, or Spawn immediately if we don't want to pick details.
+                // User said "typed their names", so let's keep the UI but change the button action.
+                
+                controlPanel.SetActive(true);
+                progressLabel.SetActive(false);
+                
+                // Remove old listener that starts a new game
+                startButton.onClick.RemoveAllListeners();
+                startButton.onClick.AddListener(SpawnMyCharacter);
+                
+                // Change button text if possible to "Spawn"
+                var btnText = startButton.GetComponentInChildren<TMP_Text>();
+                if (btnText) btnText.text = "SPAWN";
+            }
+            else
+            {
+                // Standalone mode (Testing SampleScene directly)
+                startButton.onClick.AddListener(StartGame);
+                controlPanel.SetActive(true);
+                progressLabel.SetActive(false);
+            }
+        }
+        
+        private void SpawnMyCharacter()
+        {
+             if (_runner == null || !_runner.IsRunning) return;
+             
+             controlPanel.SetActive(false);
+
+             // Find our persistent LobbyPlayerData
+             var playerObject = _runner.GetPlayerObject(_runner.LocalPlayer);
+             if (playerObject != null)
+             {
+                 var lobbyData = playerObject.GetComponent<LobbyPlayerData>();
+                 if (lobbyData != null)
+                 {
+                     // Use the existing networked object to request the spawn!
+                     lobbyData.RPC_RequestSpawnInGame(playerPrefab);
+                     return;
+                 }
+             }
+
+             // Fallback for Host (Host can always spawn directly)
+             if (_runner.IsServer)
+             {
+                 Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5, 5), 1, UnityEngine.Random.Range(-5, 5));
+                 _runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, _runner.LocalPlayer);
+             }
+             else
+             {
+                 Debug.LogError("Could not find LobbyPlayerData to request spawn!");
+             }
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        private void RPC_RequestSpawn(string name, int colorIndex, RpcInfo info = default)
+        {
+             // Host receives this
+             SpawnPlayer(info.Source);
+        }
+
+        private void SpawnPlayer(PlayerRef player)
+        {
+            Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5, 5), 1, UnityEngine.Random.Range(-5, 5));
+            NetworkObject networkPlayerObject = _runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
         }
 
         async void StartGame()
@@ -35,7 +106,6 @@ namespace Com.MyCompany.MyGame
             controlPanel.SetActive(false);
             progressLabel.SetActive(true);
             
-            // Keep this object alive when the scene reloads
             DontDestroyOnLoad(gameObject);
 
             _runner = gameObject.AddComponent<NetworkRunner>();
@@ -58,10 +128,11 @@ namespace Com.MyCompany.MyGame
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            if (runner.IsServer)
+            // If in standalone mode, spawn immediately
+            if (runner.IsServer && controlPanel.activeSelf == false) 
             {
-                Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5, 5), 1, UnityEngine.Random.Range(-5, 5));
-                NetworkObject networkPlayerObject = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                 Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5, 5), 1, UnityEngine.Random.Range(-5, 5));
+                 runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
             }
         }
 
@@ -75,7 +146,6 @@ namespace Com.MyCompany.MyGame
             var chatMgr = FindFirstObjectByType<ChatManager>();
             if (chatMgr != null && chatMgr.IsChatOpen)
             {
-                // Send zero input
                 data.direction = Vector2.zero;
                 input.Set(data);
                 return;
@@ -94,11 +164,8 @@ namespace Com.MyCompany.MyGame
                 data.isInteractPressed = Keyboard.current.fKey.isPressed;
             }
 
-
-
             data.direction = new Vector2(x, y);
             
-            // Capture Camera Rotation for Freelook Movement
             if (Camera.main != null)
             {
                 data.lookYaw = Camera.main.transform.eulerAngles.y;
