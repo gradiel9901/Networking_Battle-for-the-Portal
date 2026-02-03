@@ -33,6 +33,7 @@ namespace Com.MyCompany.MyGame
         [SerializeField] private Button lobbyPlayButton; // For host to start game potentially
         [SerializeField] private TextMeshProUGUI lobbyPlayButtonText; // To change text between "Play" and "Ready"
         [SerializeField] private Button lobbyCloseButton;
+        [SerializeField] private TextMeshProUGUI playerListText;
         
         [Header("Prefabs")]
         [SerializeField] private NetworkPrefabRef lobbyPlayerPrefab;
@@ -112,7 +113,11 @@ namespace Com.MyCompany.MyGame
         private async void StartGame(GameMode mode, string sessionName)
         {
             // Create Runner
-            _runner = gameObject.AddComponent<NetworkRunner>();
+            _runner = gameObject.GetComponent<NetworkRunner>();
+            if (_runner == null)
+            {
+                _runner = gameObject.AddComponent<NetworkRunner>();
+            }
             _runner.ProvideInput = true;
 
             var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
@@ -121,12 +126,18 @@ namespace Com.MyCompany.MyGame
                 sceneInfo.AddSceneRef(scene, LoadSceneMode.Single);
             }
 
+            var sceneManager = gameObject.GetComponent<NetworkSceneManagerDefault>();
+            if (sceneManager == null)
+            {
+                sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
+            }
+
             await _runner.StartGame(new StartGameArgs()
             {
                 GameMode = mode,
                 SessionName = sessionName,
                 Scene = sceneInfo,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                SceneManager = sceneManager,
                 // We need to disable object initialization if we want to manually spawn for now, 
                 // but usually spawning happens after. Let's just pass defaults.
             });
@@ -159,6 +170,19 @@ namespace Com.MyCompany.MyGame
              if (_runner.IsServer)
              {
                  // Host: Start the actual game level
+                 // Ensure HOST data is updated too!
+                 var localPlayerObj = _runner.GetPlayerObject(_runner.LocalPlayer);
+                 if (localPlayerObj != null)
+                 {
+                     var lobbyData = localPlayerObj.GetComponent<LobbyPlayerData>();
+                     var launcher = FindFirstObjectByType<FusionLauncher>();
+                     if (lobbyData != null && launcher != null)
+                     {
+                         lobbyData.RPC_SetPlayerName(launcher.GetLocalPlayerName());
+                         lobbyData.RPC_SetTeam(launcher.GetLocalPlayerTeamIndex());
+                     }
+                 }
+
                  if (CheckAllPlayersReady())
                  {
                      Debug.Log("HOST STARTING GAME!");
@@ -185,6 +209,14 @@ namespace Com.MyCompany.MyGame
                      var lobbyData = localPlayerObj.GetComponent<LobbyPlayerData>();
                      if (lobbyData != null)
                      {
+                         // FORCE UPDATE DETAILS FROM UI BEFORE READYING
+                         var launcher = FindFirstObjectByType<FusionLauncher>();
+                         if (launcher != null)
+                         {
+                             lobbyData.RPC_SetPlayerName(launcher.GetLocalPlayerName());
+                             lobbyData.RPC_SetTeam(launcher.GetLocalPlayerTeamIndex());
+                         }
+
                          lobbyData.RPC_SetReady(!lobbyData.IsReady);
                      }
                  }
@@ -210,7 +242,7 @@ namespace Com.MyCompany.MyGame
                  codeText.text = $"Code: {_runner.SessionInfo.Name}";
                  playerCountText.text = $"Players: {_runner.SessionInfo.PlayerCount}/{_runner.SessionInfo.MaxPlayers}";
 
-                 if (_runner.IsServer)
+             if (_runner.IsServer)
                  {
                      bool allReady = CheckAllPlayersReady();
                      if (lobbyPlayButtonText != null) lobbyPlayButtonText.text = "PLAY";
@@ -238,6 +270,19 @@ namespace Com.MyCompany.MyGame
                      lobbyPlayButton.colors = colors;
                      
                      lobbyPlayButton.interactable = true;
+                 }
+
+                 if (playerListText != null)
+                 {
+                     var sb = new System.Text.StringBuilder();
+                     foreach (var p in _spawnedPlayers)
+                     {
+                         if (p != null)
+                         {
+                             sb.AppendLine($"{p.PlayerName} {(p.IsReady ? "<color=green>(Ready)</color>" : "<color=red>(Not Ready)</color>")}");
+                         }
+                     }
+                     playerListText.text = sb.ToString();
                  }
             }
         }

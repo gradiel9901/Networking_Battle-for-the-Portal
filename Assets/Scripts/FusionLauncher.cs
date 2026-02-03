@@ -20,7 +20,9 @@ namespace Com.MyCompany.MyGame
 
         [Header("Game Settings")]
         [SerializeField] private NetworkPrefabRef playerPrefab; 
-
+        [SerializeField] private Transform teamASpawnPoint;
+        [SerializeField] private Transform teamBSpawnPoint;
+ 
         private NetworkRunner _runner;
 
         private void Start()
@@ -129,9 +131,51 @@ namespace Com.MyCompany.MyGame
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
             // If in standalone mode, spawn immediately
+            // If in standalone mode, spawn immediately
             if (runner.IsServer && controlPanel.activeSelf == false) 
             {
-                 Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-5, 5), 1, UnityEngine.Random.Range(-5, 5));
+                 // STANDALONE MODE SPAWN LOGIC (Host vs World)
+                 // 1. Determine Host Team
+                 int hostTeamIndex = GetLocalPlayerTeamIndex(); 
+
+                 // 2. Assign Player Team
+                 int teamIndex = 0;
+                 if (player == runner.LocalPlayer)
+                 {
+                     teamIndex = hostTeamIndex;
+                 }
+                 else
+                 {
+                     // Remote Players get the OPPOSITE team to ensure fighting
+                     teamIndex = (hostTeamIndex == 0) ? 1 : 0;
+                 }
+
+                 Transform spawnTransform = (teamIndex == 0) ? teamASpawnPoint : teamBSpawnPoint;
+                 
+                 // Fallback: If Inspector reference is missing, find by name
+                 if (spawnTransform == null)
+                 {
+                     Debug.LogWarning($"[FusionLauncher] Inspector SpawnPoint for Team {teamIndex} is NULL. Searching by name...");
+                     string targetName = (teamIndex == 0) ? "TeamASpawn" : "TeamBSpawn";
+                     GameObject foundObj = GameObject.Find(targetName);
+                     if (foundObj == null) foundObj = GameObject.Find((teamIndex == 0) ? "Team A Spawn" : "Team B Spawn");
+                     
+                     if (foundObj != null) spawnTransform = foundObj.transform;
+                 }
+
+                 Vector3 spawnPosition;
+                 if (spawnTransform != null)
+                 {
+                     Vector3 randomLocalPos = new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), 0, UnityEngine.Random.Range(-0.5f, 0.5f));
+                     spawnPosition = spawnTransform.TransformPoint(randomLocalPos);
+                 }
+                 else
+                 {
+                     spawnPosition = new Vector3(0, 2, 0); 
+                     Debug.LogWarning("Spawn Zone NOT FOUND! Spawning at 0,2,0");
+                 }
+
+                 Debug.Log($"[Standalone Spawn] Spawning Player {player.PlayerId} (Host? {player == runner.LocalPlayer}) as Team {teamIndex} at {spawnPosition}");
                  runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
             }
         }
@@ -199,9 +243,20 @@ namespace Com.MyCompany.MyGame
             return nameInputField.text;
         }
 
-        public int GetLocalPlayerColorIndex()
+        public int GetLocalPlayerTeamIndex()
         {
-            return colorDropdown.value;
+            // Assuming Dropdown options are: 0: Team A, 1: Team B
+            return colorDropdown.value; 
+        }
+
+        public Transform GetTeamASpawnPoint()
+        {
+            return teamASpawnPoint;
+        }
+
+        public Transform GetTeamBSpawnPoint()
+        {
+            return teamBSpawnPoint;
         }
     }
 }

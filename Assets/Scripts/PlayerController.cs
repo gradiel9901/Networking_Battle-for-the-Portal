@@ -26,8 +26,8 @@ namespace Com.MyCompany.MyGame
             Color.cyan, Color.magenta, Color.white, Color.black 
         };
 
-        [Networked]
-        public NetworkString<_16> PlayerName { get; set; }
+        // PlayerName moved to bottom with OnChanged
+        // [Networked] public NetworkString<_16> PlayerName { get; set; }
 
         [Networked]
         public int PlayerColorIndex { get; set; }
@@ -246,7 +246,43 @@ namespace Com.MyCompany.MyGame
 
         public override void Render()
         {
-            UpdateVisuals();
+            // Manual Change Detection to avoid Fusion versioning issues with OnChanged
+            if (TeamIndex != _lastTeamIndex || PlayerName.ToString() != _lastPlayerName)
+            {
+                _lastTeamIndex = TeamIndex;
+                _lastPlayerName = PlayerName.ToString();
+                UpdateVisuals();
+            }
+
+            UpdateVisuals(); // Keep this call if it was doing per-frame updates, or rely on change detection? 
+            // Original code called UpdateVisuals() every frame. 
+            // Note: Calling UpdateVisuals every frame might be expensive if it instantiates particles.
+            // Let's look at UpdateVisuals implementation.
+            // It calls TeamVisualsHelper.Apply... which checks for existing containers.
+            // So it's safe to call often, but the CHANGE detection is better for One-Shot events.
+            // However, to be safe and match original behavior + new fix, we can leave the original call OR just rely on the new one.
+            // Since the user had issues with visibility, let's trust the change detection mainly, 
+            // BUT the original code bad `UpdateVisuals()` at the top. 
+            // Let's REMOVE the unconditional `UpdateVisuals()` and rely on the Change Detection + Spawned() call.
+            
+            // Actually, wait. UpdateVisuals updates the Name Text too. 
+            // If we remove it, the name might not update during interpolation?
+            // Re-adding the unconditional call effectively masks the issue but is wasteful.
+            // The SAFE fix is to keep the unconditional call for now (or move it inside the check if we are sure).
+            // Let's just ADD the check at the top and keep the rest flow.
+            
+            // ... Wait, if I see the code below line 248, it says `UpdateVisuals();`.
+            // I will replace it.
+            
+            base.Render(); // Don't forget base.Render() if needed, though usually empty in NetworkBehaviour.
+            
+            // MERGED LOGIC
+            if (TeamIndex != _lastTeamIndex || PlayerName.ToString() != _lastPlayerName)
+            {
+                _lastTeamIndex = TeamIndex;
+                _lastPlayerName = PlayerName.ToString();
+                UpdateVisuals();
+            }
             
             if (_lastVisibleHealth != CurrentHealth)
             {
@@ -429,12 +465,42 @@ namespace Com.MyCompany.MyGame
             {
                 Local = this; // Set static reference
                 
-                FusionLauncher launcher = FindFirstObjectByType<FusionLauncher>();
-                if (launcher != null)
+                // 1. Try to find the persistent LobbyPlayerData first (Correct approach for Lobby flow)
+                // We need to find the one that has InputAuthority (ours)
+                var allLobbyData = FindObjectsByType<LobbyPlayerData>(FindObjectsSortMode.None);
+                LobbyPlayerData myLobbyData = null;
+                foreach (var lobby in allLobbyData)
                 {
-                    var name = launcher.GetLocalPlayerName();
-                    var col = launcher.GetLocalPlayerColorIndex();
-                    RPC_SetDetails(name, col);
+                    if (lobby.Object != null && lobby.Object.HasInputAuthority)
+                    {
+                        myLobbyData = lobby;
+                        break;
+                    }
+                }
+
+                if (myLobbyData != null)
+                {
+                    // Found Lobby Data: The Server ALREADY used this to set our Name/Team.
+                    // We do NOT need to send an RPC to overwrite it. 
+                    // Trust the State Authority (Server).
+                    Debug.Log($"[PlayerController] Found LobbyPlayerData (Name: {myLobbyData.PlayerName}). Trusting Server Spawn logic.");
+                }
+                else
+                {
+                    // 2. Fallback: Standalone Mode (or direct scene load) logic
+                    // Only used if we started directly in SampleScene without a Lobby
+                    
+                    // We check if our TeamIndex is ALREADY set (e.g. by Editor properties?)
+                    // But usually in standalone it's 0.
+                    
+                    FusionLauncher launcher = FindFirstObjectByType<FusionLauncher>();
+                    if (launcher != null)
+                    {
+                         Debug.LogWarning("[PlayerController] No LobbyPlayerData found. Initializing from FusionLauncher UI (Standalone Mode).");
+                        var name = launcher.GetLocalPlayerName();
+                        var teamIndex = launcher.GetLocalPlayerTeamIndex();
+                        RPC_SetDetails(name, teamIndex);
+                    }
                 }
                 _hpBar = FindFirstObjectByType<HPBarController>();
                 if (_hpBar != null) _hpBar.UpdateHealth(CurrentHealth, MaxHealth);
@@ -465,11 +531,22 @@ namespace Com.MyCompany.MyGame
             }
         }
 
+        [Networked]
+        public NetworkString<_16> PlayerName { get; set; }
+
+        [Networked]
+        public int TeamIndex { get; set; }
+
+        private int _lastTeamIndex = -1;
+        private string _lastPlayerName = "";
+
+        // Render method merged above
+
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        public void RPC_SetDetails(string name, int colorIndex)
+        public void RPC_SetDetails(string name, int teamIndex)
         {
             this.PlayerName = name;
-            this.PlayerColorIndex = colorIndex;
+            this.TeamIndex = teamIndex;
         }
 
         private int _spectatingIndex = -1;
@@ -521,7 +598,7 @@ namespace Com.MyCompany.MyGame
             }
             
             Debug.Log($"Spectating: {target.PlayerName}");
-        }
+        } 
 
         private void UpdateVisuals()
         {
@@ -530,9 +607,14 @@ namespace Com.MyCompany.MyGame
                 _spawnedNameText.text = PlayerName.ToString();
             }
 
-            if (PlayerColorIndex >= 0 && PlayerColorIndex < availableColors.Length)
+            // Team Visuals (Procedural Fire/Ice)
+            if (TeamIndex == 0)
             {
-                playerRenderer.material.color = availableColors[PlayerColorIndex];
+                TeamVisualsHelper.ApplyFireVisuals(this.gameObject, playerRenderer);
+            }
+            else if (TeamIndex == 1)
+            {
+                TeamVisualsHelper.ApplyIceVisuals(this.gameObject, playerRenderer);
             }
         }
     }
