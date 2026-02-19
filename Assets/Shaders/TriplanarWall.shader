@@ -1,4 +1,4 @@
-Shader "Custom/TriplanarWall"
+﻿Shader "Custom/TriplanarWall"
 {
     Properties
     {
@@ -98,8 +98,7 @@ Shader "Custom/TriplanarWall"
                 return output;
             }
 
-            // Triplanar sampling — projects texture from X, Y, Z axes
-            float4 TriplanarSample(TEXTURE2D_PARAM(tex, samp), float3 worldPos, float3 blendWeights)
+float4 TriplanarSample(TEXTURE2D_PARAM(tex, samp), float3 worldPos, float3 blendWeights)
             {
                 float2 uvX = worldPos.zy * _Tiling;
                 float2 uvY = worldPos.xz * _Tiling;
@@ -112,8 +111,7 @@ Shader "Custom/TriplanarWall"
                 return colX * blendWeights.x + colY * blendWeights.y + colZ * blendWeights.z;
             }
 
-            // Triplanar normal sampling with proper tangent-space blending
-            float3 TriplanarNormal(TEXTURE2D_PARAM(tex, samp), float3 worldPos, float3 blendWeights)
+float3 TriplanarNormal(TEXTURE2D_PARAM(tex, samp), float3 worldPos, float3 blendWeights)
             {
                 float2 uvX = worldPos.zy * _Tiling;
                 float2 uvY = worldPos.xz * _Tiling;
@@ -127,8 +125,7 @@ Shader "Custom/TriplanarWall"
                 nY = float3(nY.xy * _NormalStrength, nY.z);
                 nZ = float3(nZ.xy * _NormalStrength, nZ.z);
 
-                // Whiteout blending for proper triplanar normals
-                nX = float3(nX.xy + float2(0, 0), nX.z);
+nX = float3(nX.xy + float2(0, 0), nX.z);
                 nY = float3(nY.xy + float2(0, 0), nY.z);
                 nZ = float3(nZ.xy + float2(0, 0), nZ.z);
 
@@ -137,34 +134,30 @@ Shader "Custom/TriplanarWall"
 
             float4 frag(Varyings input) : SV_Target
             {
-                // Calculate blend weights from world normal
+
                 float3 absNormal = abs(input.normalWS);
                 float3 blendWeights = pow(absNormal, _Sharpness);
                 blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z + 0.0001);
 
-                // Sample albedo via triplanar
-                float4 albedo = TriplanarSample(
+float4 albedo = TriplanarSample(
                     TEXTURE2D_ARGS(_MainTex, sampler_MainTex),
                     input.positionWS, blendWeights
                 );
                 albedo *= _Color;
 
-                // Sample normal via triplanar
-                float3 triNormal = TriplanarNormal(
+float3 triNormal = TriplanarNormal(
                     TEXTURE2D_ARGS(_NormalMap, sampler_NormalMap),
                     input.positionWS, blendWeights
                 );
 
-                // Build TBN matrix and transform normal to world space
-                float3x3 TBN = float3x3(
+float3x3 TBN = float3x3(
                     normalize(input.tangentWS),
                     normalize(input.bitangentWS),
                     normalize(input.normalWS)
                 );
                 float3 normalWS = normalize(mul(triNormal, TBN));
 
-                // URP Lighting
-                InputData inputData = (InputData)0;
+InputData inputData = (InputData)0;
                 inputData.positionWS = input.positionWS;
                 inputData.normalWS = normalWS;
                 inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(input.positionWS);
@@ -177,15 +170,13 @@ Shader "Custom/TriplanarWall"
                     inputData.shadowCoord = float4(0, 0, 0, 0);
                 #endif
 
-                // Sample roughness via triplanar (invert to smoothness)
-                float roughness = TriplanarSample(
+float roughness = TriplanarSample(
                     TEXTURE2D_ARGS(_RoughnessMap, sampler_RoughnessMap),
                     input.positionWS, blendWeights
                 ).r;
                 float finalSmoothness = _Smoothness * (1.0 - roughness * _RoughnessStrength);
 
-                // Sample occlusion via triplanar
-                float occlusion = TriplanarSample(
+float occlusion = TriplanarSample(
                     TEXTURE2D_ARGS(_OcclusionMap, sampler_OcclusionMap),
                     input.positionWS, blendWeights
                 ).r;
@@ -207,8 +198,7 @@ Shader "Custom/TriplanarWall"
             ENDHLSL
         }
 
-        // Shadow caster pass
-        Pass
+Pass
         {
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }

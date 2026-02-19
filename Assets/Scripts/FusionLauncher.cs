@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Fusion;
 using TMPro;
 using UnityEngine.UI;
@@ -32,8 +32,7 @@ namespace Com.MyCompany.MyGame
                 return;
             }
 
-            // Store Character Selection
-            byte[] token = null;
+byte[] token = null;
             if (colorDropdown != null)
             {
                 Network.NetworkSessionManager.Instance.LocalCharacterIndex = colorDropdown.value;
@@ -42,8 +41,7 @@ namespace Com.MyCompany.MyGame
                 Debug.Log($"[FusionLauncher] Selected Character Index: {index}");
             }
 
-            // Using AutoHostOrClient as requested for testing
-            Network.NetworkSessionManager.Instance.StartGame(GameMode.AutoHostOrClient, token);
+Network.NetworkSessionManager.Instance.StartGame(GameMode.AutoHostOrClient, token);
         }
 
         public string GetLocalPlayerName()

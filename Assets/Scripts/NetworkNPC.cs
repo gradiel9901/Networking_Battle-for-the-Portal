@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,6 +20,10 @@ namespace Network
         [SerializeField] private float _attackRange = 1.5f;
         [SerializeField] private int _attackDamage = 100;
 
+        [Header("Contact Damage")]
+        [SerializeField] private int _contactDamage = 25;
+        [SerializeField] private float _contactDamageInterval = 1f;
+
         [Header("Roam Settings")]
         [SerializeField] private float _roamSpeed = 2f;
         [SerializeField] private float _roamRadius = 10f;
@@ -30,21 +34,31 @@ namespace Network
         private NetworkPlayer _currentTarget;
         private string _lastAnimation;
         private float _chaseLoseMultiplier = 1.5f;
+        private int _detectionTick;
+        [SerializeField] private int _detectionInterval = 3;
+        private Vector3 _lastSetDestination;
+        [SerializeField] private float _destinationUpdateDistance = 0.8f;
+        private float _contactDamageCooldown;
 
         [Networked] private TickTimer RoamWaitTimer { get; set; }
+        [Networked] private TickTimer StunTimer { get; set; }
         [Networked] private NPCState CurrentState { get; set; }
 
         private enum NPCState
         {
             Idle,
             Roaming,
-            Chasing
+            Chasing,
+            Stunned
         }
 
         public override void Spawned()
         {
             _agent = GetComponent<NavMeshAgent>();
             _animator = GetComponentInChildren<Animator>();
+
+foreach (var col in GetComponentsInChildren<Collider>())
+                col.isTrigger = true;
 
             if (HasStateAuthority)
             {
@@ -69,18 +83,26 @@ namespace Network
                 case NPCState.Idle:
                     HandleRoamState();
 
-                    NetworkPlayer detected = DetectPlayerInCone();
-                    if (detected != null)
+_detectionTick++;
+                    if (_detectionTick >= _detectionInterval)
                     {
-                        _currentTarget = detected;
-                        CurrentState = NPCState.Chasing;
-                        _agent.speed = _chaseSpeed;
-                        Debug.Log($"[NetworkNPC] Detected {_currentTarget.PlayerName}! Chasing!");
+                        _detectionTick = 0;
+                        NetworkPlayer detected = DetectPlayerInCone();
+                        if (detected != null)
+                        {
+                            _currentTarget = detected;
+                            CurrentState = NPCState.Chasing;
+                            _agent.speed = _chaseSpeed;
+                        }
                     }
                     break;
 
                 case NPCState.Chasing:
                     HandleChaseState();
+                    break;
+
+                case NPCState.Stunned:
+                    HandleStunState();
                     break;
             }
         }
@@ -102,6 +124,10 @@ namespace Network
                         PlayAnimation("NPC_Idle");
                     break;
 
+                case NPCState.Stunned:
+                    PlayAnimation("NPC_Stunned");
+                    break;
+
                 default:
                     PlayAnimation("NPC_Idle");
                     break;
@@ -121,16 +147,14 @@ namespace Network
         {
             _agent.speed = _roamSpeed;
 
-            // Waiting at current spot
-            if (RoamWaitTimer.IsRunning && !RoamWaitTimer.Expired(Runner))
+if (RoamWaitTimer.IsRunning && !RoamWaitTimer.Expired(Runner))
             {
                 _agent.isStopped = true;
                 CurrentState = NPCState.Idle;
                 return;
             }
 
-            // Wait just finished — pick new destination
-            if (RoamWaitTimer.Expired(Runner))
+if (RoamWaitTimer.Expired(Runner))
             {
                 RoamWaitTimer = default;
                 SetNewRoamDestination();
@@ -139,8 +163,7 @@ namespace Network
             CurrentState = NPCState.Roaming;
             _agent.isStopped = false;
 
-            // Arrived at destination — start waiting
-            if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance + 0.1f)
+if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance + 0.1f)
             {
                 RoamWaitTimer = TickTimer.CreateFromSeconds(Runner, _roamWaitTime);
                 CurrentState = NPCState.Idle;
@@ -157,11 +180,10 @@ namespace Network
                 if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
                 {
                     _agent.SetDestination(hit.position);
-                    Debug.Log($"[NetworkNPC] New roam destination: {hit.position}");
                     return;
                 }
             }
-            Debug.LogWarning("[NetworkNPC] Could not find roam destination!");
+
         }
 
         #endregion
@@ -173,7 +195,7 @@ namespace Network
             NetworkPlayer closest = null;
             float closestDist = float.MaxValue;
 
-            var allPlayers = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.None);
+            var allPlayers = Runner.GetAllBehaviours<NetworkPlayer>();
 
             foreach (var player in allPlayers)
             {
@@ -229,7 +251,6 @@ namespace Network
 
             if (distanceToTarget > _detectionRange * _chaseLoseMultiplier)
             {
-                Debug.Log("[NetworkNPC] Lost target. Returning to roam.");
                 ReturnToRoaming();
                 return;
             }
@@ -241,7 +262,14 @@ namespace Network
             }
 
             _agent.isStopped = false;
-            _agent.SetDestination(_currentTarget.transform.position);
+
+float sqrMoved = (_currentTarget.transform.position - _lastSetDestination).sqrMagnitude;
+            float threshold = _destinationUpdateDistance * _destinationUpdateDistance;
+            if (sqrMoved > threshold)
+            {
+                _lastSetDestination = _currentTarget.transform.position;
+                _agent.SetDestination(_currentTarget.transform.position);
+            }
 
             Vector3 lookDir = (_currentTarget.transform.position - transform.position).normalized;
             lookDir.y = 0;
@@ -258,10 +286,7 @@ namespace Network
         private void KillTarget()
         {
             if (_currentTarget != null && _currentTarget.CurrentHealth > 0)
-            {
                 _currentTarget.RPC_TakeDamage(_attackDamage);
-                Debug.Log($"[NetworkNPC] Killed {_currentTarget.PlayerName}!");
-            }
 
             ReturnToRoaming();
         }
@@ -271,25 +296,72 @@ namespace Network
             _currentTarget = null;
             CurrentState = NPCState.Roaming;
             _agent.speed = _roamSpeed;
+            if (_agent != null && _agent.enabled) _agent.isStopped = false;
             SetNewRoamDestination();
         }
 
         #endregion
 
-        #region Gizmos
+        #region Stun Logic
+
+        public void Stun(float duration)
+        {
+            if (!HasStateAuthority) return;
+
+            _currentTarget = null;
+            CurrentState = NPCState.Stunned;
+            StunTimer = TickTimer.CreateFromSeconds(Runner, duration);
+            if (_agent != null && _agent.enabled) _agent.isStopped = true;
+        }
+
+        private void HandleStunState()
+        {
+            if (_agent != null && _agent.enabled) _agent.isStopped = true;
+
+            if (StunTimer.Expired(Runner))
+            {
+                StunTimer = default;
+                ReturnToRoaming();
+            }
+        }
+
+        #endregion
+
+        #region Contact Damage
+
+private void OnTriggerStay(Collider other)
+        {
+            if (!HasStateAuthority) return;
+            if (CurrentState == NPCState.Stunned) return;
+
+if (_contactDamageCooldown > 0f)
+            {
+                _contactDamageCooldown -= Time.deltaTime;
+                return;
+            }
+
+            var player = other.GetComponentInParent<NetworkPlayer>();
+            if (player != null && player.CurrentHealth > 0 && !player.HasFinished)
+            {
+                player.RPC_TakeDamage(_contactDamage);
+                _contactDamageCooldown = _contactDamageInterval;
+            }
+        }
+
+        #endregion
+
+#region Gizmos
 
         private void OnDrawGizmosSelected()
         {
-            // Detection range sphere
+
             Gizmos.color = new Color(1f, 1f, 0f, 0.15f);
             Gizmos.DrawWireSphere(transform.position, _detectionRange);
 
-            // Attack range
-            Gizmos.color = Color.red;
+Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, _attackRange);
 
-            // Vision cone
-            Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
             Vector3 origin = transform.position + Vector3.up * 0.5f;
 
             Vector3 leftBoundary = Quaternion.Euler(0, -_detectionAngle, 0) * transform.forward;

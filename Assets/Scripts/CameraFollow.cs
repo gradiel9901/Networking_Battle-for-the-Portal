@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Com.MyCompany.MyGame
 {
@@ -6,7 +6,7 @@ namespace Com.MyCompany.MyGame
     {
         private void Awake()
         {
-            // Auto-disable if Cinemachine is present to avoid conflicts
+
             if (FindFirstObjectByType<Unity.Cinemachine.CinemachineCamera>() != null)
             {
                 Debug.LogWarning("[CameraFollow] Disabling self because CinemachineCamera was found.");
@@ -16,7 +16,7 @@ namespace Com.MyCompany.MyGame
         }
 
         [SerializeField] private float smoothSpeed = 0.125f;
-        [SerializeField] private Vector3 offset = new Vector3(0, 10, -10); // Default isometric-style offset
+        [SerializeField] private Vector3 offset = new Vector3(0, 10, -10);
 
         private Transform target;
 

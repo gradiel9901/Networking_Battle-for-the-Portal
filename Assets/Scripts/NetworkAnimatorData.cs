@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 namespace Network
@@ -6,7 +6,7 @@ namespace Network
     public struct NetworkAnimatorData : INetworkStruct
     {
         public float Speed;
-        public NetworkBool Jump; // Kept for trigger if needed, but IsGrounded is better for state
+        public NetworkBool Jump;
         public NetworkBool Forward;
         public NetworkBool Back;
         public NetworkBool Left;

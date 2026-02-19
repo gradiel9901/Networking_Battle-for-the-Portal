@@ -1,3 +1,4 @@
+﻿using TMPro;
 using UnityEngine;
 
 namespace Com.MyCompany.MyGame
@@ -7,6 +8,7 @@ namespace Com.MyCompany.MyGame
         [Header("UI References")]
         [SerializeField] private GameObject deathPanel;
         [SerializeField] private UnityEngine.UI.Button spectateButton;
+        [SerializeField] private TextMeshProUGUI countdownText;
 
         public static DeathUIManager Instance;
 
@@ -22,32 +24,33 @@ namespace Com.MyCompany.MyGame
                 return;
             }
 
-            // Ensure starts hidden
             if (deathPanel != null) deathPanel.SetActive(false);
-            
+
             if (spectateButton != null)
-            {
                 spectateButton.onClick.AddListener(OnSpectateClicked);
-            }
         }
 
         private void OnSpectateClicked()
         {
-            // Find local player and tell them to spectate next
             if (Network.NetworkPlayer.Local != null)
-            {
-                Network.NetworkPlayer.Local.SpectateNextPlayer(); // Ensure SpectateNextPlayer is in NetworkPlayer!
-            }
-            // Hide the death screen so we can see the view
+                Network.NetworkPlayer.Local.SpectateNextPlayer();
+
             ToggleDeathScreen(false);
         }
 
         public void ToggleDeathScreen(bool show)
         {
             if (deathPanel != null)
-            {
                 deathPanel.SetActive(show);
-            }
+
+if (!show && countdownText != null)
+                countdownText.text = "";
+        }
+
+        public void UpdateCountdown(int seconds)
+        {
+            if (countdownText == null) return;
+            countdownText.text = seconds > 0 ? $"Respawning in {seconds}..." : "";
         }
     }
 }

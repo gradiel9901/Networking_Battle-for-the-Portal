@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -42,8 +42,7 @@ namespace Network
 
             Debug.Log($"[FinishLine] {player.PlayerName} crossed the finish line!");
 
-            // Disappear after a player passes through
-            gameObject.SetActive(false);
+gameObject.SetActive(false);
         }
 
         private void ShowFinishUI()

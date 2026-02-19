@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -48,53 +48,47 @@ namespace Network
                 _volume.profile = profile;
             }
 
-            // ── Color Adjustments ──
-            if (!profile.TryGet(out ColorAdjustments colorAdj))
+if (!profile.TryGet(out ColorAdjustments colorAdj))
                 colorAdj = profile.Add<ColorAdjustments>(true);
 
             colorAdj.active = true;
             colorAdj.postExposure.Override(-0.5f);
             colorAdj.contrast.Override(30f);
             colorAdj.saturation.Override(-40f);
-            colorAdj.colorFilter.Override(new Color(0.75f, 0.82f, 0.65f, 1f)); // Sickly green tint
+            colorAdj.colorFilter.Override(new Color(0.75f, 0.82f, 0.65f, 1f));
 
-            // ── Lift Gamma Gain ──
-            if (!profile.TryGet(out LiftGammaGain lgg))
+if (!profile.TryGet(out LiftGammaGain lgg))
                 lgg = profile.Add<LiftGammaGain>(true);
 
             lgg.active = true;
-            lgg.lift.Override(new Vector4(-0.05f, -0.02f, -0.08f, 0f));   // Push shadows towards green
-            lgg.gamma.Override(new Vector4(-0.03f, 0.02f, -0.05f, 0f));   // Green midtones
-            lgg.gain.Override(new Vector4(-0.05f, -0.02f, -0.08f, 0f));   // Desaturated highlights
+            lgg.lift.Override(new Vector4(-0.05f, -0.02f, -0.08f, 0f));
+            lgg.gamma.Override(new Vector4(-0.03f, 0.02f, -0.05f, 0f));
+            lgg.gain.Override(new Vector4(-0.05f, -0.02f, -0.08f, 0f));
 
-            // ── Tonemapping ──
-            if (!profile.TryGet(out Tonemapping tonemap))
+if (!profile.TryGet(out Tonemapping tonemap))
                 tonemap = profile.Add<Tonemapping>(true);
 
             tonemap.active = true;
             tonemap.mode.Override(TonemappingMode.ACES);
 
-            // ── Bloom ──
-            if (!profile.TryGet(out Bloom bloom))
+if (!profile.TryGet(out Bloom bloom))
                 bloom = profile.Add<Bloom>(true);
 
             bloom.active = true;
             bloom.threshold.Override(0.9f);
             bloom.intensity.Override(0.8f);
             bloom.scatter.Override(0.6f);
-            bloom.tint.Override(new Color(0.6f, 0.7f, 0.5f, 1f)); // Greenish bloom
+            bloom.tint.Override(new Color(0.6f, 0.7f, 0.5f, 1f));
 
-            // ── Vignette ──
-            if (!profile.TryGet(out Vignette vignette))
+if (!profile.TryGet(out Vignette vignette))
                 vignette = profile.Add<Vignette>(true);
 
             vignette.active = true;
-            vignette.color.Override(new Color(0.1f, 0.12f, 0.08f, 1f)); // Dark green-black edges
+            vignette.color.Override(new Color(0.1f, 0.12f, 0.08f, 1f));
             vignette.intensity.Override(0.45f);
             vignette.smoothness.Override(0.4f);
 
-            // ── Film Grain ──
-            if (!profile.TryGet(out FilmGrain grain))
+if (!profile.TryGet(out FilmGrain grain))
                 grain = profile.Add<FilmGrain>(true);
 
             grain.active = true;
@@ -102,15 +96,13 @@ namespace Network
             grain.intensity.Override(0.35f);
             grain.response.Override(0.6f);
 
-            // ── Chromatic Aberration ──
-            if (!profile.TryGet(out ChromaticAberration ca))
+if (!profile.TryGet(out ChromaticAberration ca))
                 ca = profile.Add<ChromaticAberration>(true);
 
             ca.active = true;
             ca.intensity.Override(0.1f);
 
-            // ── Color Curves ── (crush blacks, muted highlights)
-            if (!profile.TryGet(out ColorCurves curves))
+if (!profile.TryGet(out ColorCurves curves))
                 curves = profile.Add<ColorCurves>(true);
 
             curves.active = true;
@@ -130,15 +122,12 @@ namespace Network
                 }
             }
 
-            // Dim, sickly yellow-green sunlight through thick clouds
-            _directionalLight.color = new Color(0.65f, 0.7f, 0.5f, 1f);
+_directionalLight.color = new Color(0.65f, 0.7f, 0.5f, 1f);
             _directionalLight.intensity = 0.6f;
 
-            // Low angle sun — feels like dusk / overcast
-            _directionalLight.transform.rotation = Quaternion.Euler(25f, -30f, 0f);
+_directionalLight.transform.rotation = Quaternion.Euler(25f, -30f, 0f);
 
-            // Soft shadows
-            _directionalLight.shadows = LightShadows.Soft;
+_directionalLight.shadows = LightShadows.Soft;
             _directionalLight.shadowStrength = 0.85f;
 
             Debug.Log("[PostApocalypticAtmosphere] Directional light configured.");
@@ -146,10 +135,10 @@ namespace Network
 
         private void SetupFog()
         {
-            // Heavy greenish fog
+
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
-            RenderSettings.fogColor = new Color(0.22f, 0.25f, 0.18f, 1f); // Dark olive fog
+            RenderSettings.fogColor = new Color(0.22f, 0.25f, 0.18f, 1f);
             RenderSettings.fogDensity = 0.025f;
 
             Debug.Log("[PostApocalypticAtmosphere] Fog configured.");
@@ -157,13 +146,12 @@ namespace Network
 
         private void SetupAmbientLight()
         {
-            // Dark, greenish ambient
+
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.15f, 0.18f, 0.12f, 1f); // Dark muted green
+            RenderSettings.ambientLight = new Color(0.15f, 0.18f, 0.12f, 1f);
             RenderSettings.ambientIntensity = 0.8f;
 
-            // Muddy reflections
-            RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
+RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
             RenderSettings.reflectionIntensity = 0.2f;
 
             Debug.Log("[PostApocalypticAtmosphere] Ambient lighting configured.");

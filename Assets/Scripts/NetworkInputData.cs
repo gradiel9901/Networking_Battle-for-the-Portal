@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 namespace Network
@@ -6,7 +6,7 @@ namespace Network
     public struct NetworkInputData : INetworkInput
     {
         public Vector3 InputVector;
-        public Vector2 LookRotation; // X = Yaw (Body), Y = Pitch (Camera)
+        public Vector2 LookRotation;
         public NetworkBool JumpInput;
         public NetworkBool SprintInput;
         public NetworkBool CrouchInput;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
@@ -15,8 +15,8 @@ namespace Network
         [SerializeField] private TextMeshProUGUI _playerCountText;
         [SerializeField] private TextMeshProUGUI _timerCountText;
 
-
-        [Header("Spawn Settings")]
+[Header("Spawn Settings")]
+        [SerializeField] private float _spawnHeightOffset = 2f;
         #endregion
         
         private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new();
@@ -161,12 +161,9 @@ namespace Network
             var networkObject = Runner.Spawn(_playerPrefabs[characterIndex], spawnPos, Quaternion.identity, player);
             _spawnedCharacters.Add(player, networkObject);
             _usedSpawnPositions.Add(spawnPos);
-            
-            Debug.Log($"Spawned Character {characterIndex} for Player {player.PlayerId} at {spawnPos}");
         }
 
-
-        private Vector3 GetRandomPointOnNavMesh()
+private Vector3 GetRandomPointOnNavMesh()
         {
             if (_navMeshData.indices.Length == 0)
             {
@@ -210,15 +207,12 @@ namespace Network
                 }
 
                 if (!tooClose)
-                {
-                    return candidate + Vector3.up * 0.5f;
-                }
+                    return candidate + Vector3.up * _spawnHeightOffset;
             }
 
             Debug.LogWarning("[NetworkedGameManager] Could not find position with enough separation, using best random.");
-            return GetRandomPointOnNavMesh() + Vector3.up * 0.5f;
+            return GetRandomPointOnNavMesh() + Vector3.up * _spawnHeightOffset;
         }
 
-
-    }
+}
 }

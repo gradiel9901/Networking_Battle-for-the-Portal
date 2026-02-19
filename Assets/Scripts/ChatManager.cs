@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using Fusion;
@@ -21,18 +21,16 @@ namespace Com.MyCompany.MyGame
         {
              if (chatPanel != null) 
              {
-                 chatPanel.SetActive(true); // Keep GameObject active for children
-                 
-                 // Handle Background Image
-                 var img = chatPanel.GetComponent<UnityEngine.UI.Image>();
-                 if (img != null) img.enabled = false; // Hide background initially
+                 chatPanel.SetActive(true);
 
-                 // Handle Raycasting (Allow clicks to pass through when closed)
-                 _chatCanvasGroup = chatPanel.GetComponent<CanvasGroup>();
+var img = chatPanel.GetComponent<UnityEngine.UI.Image>();
+                 if (img != null) img.enabled = false;
+
+_chatCanvasGroup = chatPanel.GetComponent<CanvasGroup>();
                  if (_chatCanvasGroup == null) _chatCanvasGroup = chatPanel.AddComponent<CanvasGroup>();
-                 _chatCanvasGroup.blocksRaycasts = false; // Start with Raycasts disabled (Closed)
+                 _chatCanvasGroup.blocksRaycasts = false;
              }
-             if (chatInputField != null) chatInputField.gameObject.SetActive(false); // Input starts hidden
+             if (chatInputField != null) chatInputField.gameObject.SetActive(false);
              if (chatHistoryText != null) chatHistoryText.text = "";
         }
 
@@ -42,7 +40,7 @@ namespace Com.MyCompany.MyGame
             {
                 if (IsChatOpen)
                 {
-                    // Chat is Open -> Send Message if text is valid, then Close
+
                     if (chatInputField != null)
                     {
                         if (!string.IsNullOrWhiteSpace(chatInputField.text))
@@ -50,9 +48,8 @@ namespace Com.MyCompany.MyGame
                             SendChatMessage(chatInputField.text);
                             chatInputField.text = "";
                         }
-                        
-                        // Close Input & Background & Raycasts
-                        chatInputField.gameObject.SetActive(false);
+
+chatInputField.gameObject.SetActive(false);
                         chatInputField.DeactivateInputField();
                         
                         if (chatPanel != null)
@@ -68,7 +65,7 @@ namespace Com.MyCompany.MyGame
                 }
                 else
                 {
-                    // Chat is Closed -> Open Input & Background & Raycasts
+
                     IsChatOpen = true;
                     
                     if (chatPanel != null)
@@ -103,9 +100,8 @@ namespace Com.MyCompany.MyGame
         public void AddMessageToHistory(string message)
         {
             _messages.Add(message);
-            
-            // Limit history
-            if (_messages.Count > 20)
+
+if (_messages.Count > 20)
             {
                 _messages.RemoveAt(0);
             }

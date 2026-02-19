@@ -497,6 +497,8 @@ MonoBehaviour:
   _crouchSpeed: 2
   _jumpHeight: 1.5
   _attackDuration: 1
+  _playerAttackDamage: 100
+  _npcStunDuration: 5
   _playerCamera: {fileID: 3796687753967357157}
   _itemHoldPoint: {fileID: 5705803141527831280}
   _pickupRadius: 1
