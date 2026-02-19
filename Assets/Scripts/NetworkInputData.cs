@@ -1,20 +1,16 @@
 using Fusion;
 using UnityEngine;
 
-namespace Com.MyCompany.MyGame
+namespace Network
 {
     public struct NetworkInputData : INetworkInput
     {
-        public Vector2 direction;
-        public NetworkBool isInteractPressed;
-        public float lookYaw;
-        public NetworkButtons buttons;
-    }
-
-    public enum InputButton
-    {
-        Jump,
-        Crouch,
-        Sprint
+        public Vector3 InputVector;
+        public Vector2 LookRotation; // X = Yaw (Body), Y = Pitch (Camera)
+        public NetworkBool JumpInput;
+        public NetworkBool SprintInput;
+        public NetworkBool CrouchInput;
+        public NetworkBool InteractInput;
+        public NetworkBool AttackInput;
     }
 }

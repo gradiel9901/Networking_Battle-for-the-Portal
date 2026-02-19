@@ -34,9 +34,9 @@ namespace Com.MyCompany.MyGame
         private void OnSpectateClicked()
         {
             // Find local player and tell them to spectate next
-            if (PlayerController.Local != null)
+            if (Network.NetworkPlayer.Local != null)
             {
-                PlayerController.Local.SpectateNextPlayer();
+                Network.NetworkPlayer.Local.SpectateNextPlayer(); // Ensure SpectateNextPlayer is in NetworkPlayer!
             }
             // Hide the death screen so we can see the view
             ToggleDeathScreen(false);

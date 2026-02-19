@@ -90,9 +90,9 @@ namespace Com.MyCompany.MyGame
 
         private void SendChatMessage(string message)
         {
-            if (PlayerController.Local != null)
+            if (Network.NetworkPlayer.Local != null)
             {
-                PlayerController.Local.RPC_SendChat(message);
+                Network.NetworkPlayer.Local.RPC_SendChat(message);
             }
             else
             {

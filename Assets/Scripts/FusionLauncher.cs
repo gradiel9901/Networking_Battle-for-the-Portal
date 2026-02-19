@@ -26,14 +26,24 @@ namespace Com.MyCompany.MyGame
             controlPanel.SetActive(false);
             progressLabel.SetActive(true);
 
-            if (NetworkManager.Instance == null)
+            if (Network.NetworkSessionManager.Instance == null)
             {
-                Debug.LogError("[FusionLauncher] NetworkManager Instance is NULL! Make sure it is in the scene.");
+                Debug.LogError("[FusionLauncher] NetworkSessionManager Instance is NULL! Make sure it is in the scene.");
                 return;
             }
 
+            // Store Character Selection
+            byte[] token = null;
+            if (colorDropdown != null)
+            {
+                Network.NetworkSessionManager.Instance.LocalCharacterIndex = colorDropdown.value;
+                int index = colorDropdown.value;
+                token = System.BitConverter.GetBytes(index);
+                Debug.Log($"[FusionLauncher] Selected Character Index: {index}");
+            }
+
             // Using AutoHostOrClient as requested for testing
-            NetworkManager.Instance.StartGame(GameMode.AutoHostOrClient);
+            Network.NetworkSessionManager.Instance.StartGame(GameMode.AutoHostOrClient, token);
         }
 
         public string GetLocalPlayerName()
