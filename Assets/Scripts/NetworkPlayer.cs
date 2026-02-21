@@ -75,6 +75,9 @@ namespace Network
         private GameObject _spawnedGrave;
         private int _lastVisibleHealth;
         
+        private bool _wasGrounded = true;
+        private bool _wasAttacking = false;
+
         public static NetworkPlayer Local { get; private set; }
         #endregion
 
@@ -366,6 +369,34 @@ if (AnimatorData.IsAttacking)
             {
                  if (HasInputAuthority) Debug.LogWarning($"[NetworkPlayer] Animator is NULL on {PlayerName}! Assign it in Inspector.");
             }
+
+            // --- Sound Manager Integration ---
+            if (HasInputAuthority && Com.MyCompany.MyGame.SoundManager.Instance != null)
+            {
+                // Walk vs Run evaluates actual magnitude of inputs/velocity from animator data
+                bool isMoving = AnimatorData.Speed > 0.1f;
+                bool isRunning = isMoving && AnimatorData.Speed > (_walkSpeed + 0.1f); // Lower threshold to ensure run registers
+                bool isWalking = isMoving && !isRunning;
+                
+                // Set movement sound loop (walk/run) or stop it if idle
+                Com.MyCompany.MyGame.SoundManager.Instance.SetPlayerMovementSound(isWalking, isRunning);
+
+                // Play jump sound exactly when we transition to the jump state
+                if (!AnimatorData.IsGrounded && _wasGrounded)
+                {
+                     Com.MyCompany.MyGame.SoundManager.Instance.PlaySFX(Com.MyCompany.MyGame.SoundManager.Instance.JumpClip);
+                }
+
+                // Play attack sound exactly when we transition to the attack state
+                if (AnimatorData.IsAttacking && !_wasAttacking)
+                {
+                     Com.MyCompany.MyGame.SoundManager.Instance.PlaySFX(Com.MyCompany.MyGame.SoundManager.Instance.AttackClip);
+                }
+
+                _wasGrounded = AnimatorData.IsGrounded;
+                _wasAttacking = AnimatorData.IsAttacking;
+            }
+            // ---------------------------------
 
 if (_cachedMainCamera == null) _cachedMainCamera = Camera.main;
 

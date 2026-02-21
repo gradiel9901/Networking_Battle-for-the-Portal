@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Com.MyCompany.MyGame
 {
+    // main menu launcher, handles player name + character selection before starting the game
     public class FusionLauncher : MonoBehaviour
     {
         [Header("UI References")]
@@ -23,6 +24,7 @@ namespace Com.MyCompany.MyGame
 
         private void StartGame()
         {
+            // swap to the loading label while fusion connects
             controlPanel.SetActive(false);
             progressLabel.SetActive(true);
 
@@ -32,7 +34,8 @@ namespace Com.MyCompany.MyGame
                 return;
             }
 
-byte[] token = null;
+            // convert the dropdown selection to bytes so we can send it as a connection token
+            byte[] token = null;
             if (colorDropdown != null)
             {
                 Network.NetworkSessionManager.Instance.LocalCharacterIndex = colorDropdown.value;
@@ -41,7 +44,8 @@ byte[] token = null;
                 Debug.Log($"[FusionLauncher] Selected Character Index: {index}");
             }
 
-Network.NetworkSessionManager.Instance.StartGame(GameMode.AutoHostOrClient, token);
+            // AutoHostOrClient means fusion decides if we're host or client automatically
+            Network.NetworkSessionManager.Instance.StartGame(GameMode.AutoHostOrClient, token);
         }
 
         public string GetLocalPlayerName()

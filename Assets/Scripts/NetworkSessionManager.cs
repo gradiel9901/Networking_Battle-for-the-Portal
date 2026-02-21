@@ -81,17 +81,27 @@ _inputActions = new InputSystem_Actions();
 
             if (NetworkPlayer.Local == null) return;
 
-if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            // We only lock the cursor if the left mouse button is pressed AND the user isn't clicking on a UI element or an active menu. 
+            // InGameMenuUI handles unlocking it when the Esc menu is open.
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && Cursor.lockState == CursorLockMode.None)
             {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+                 bool isOverUI = UnityEngine.EventSystems.EventSystem.current != null && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+                 bool isMenuOpen = InGameMenuUI.Instance != null && InGameMenuUI.Instance.IsMenuOpen;
+                 
+                 if (!isOverUI && !isMenuOpen)
+                 {
+                     Cursor.lockState = CursorLockMode.Locked;
+                     Cursor.visible = false;
+                 }
             }
-            
-            if (Mouse.current.leftButton.wasPressedThisFrame && Cursor.lockState == CursorLockMode.None)
+
+            // --- Sound Manager Integration ---
+            if (SoundManager.Instance != null && NetworkPlayer.Local != null)
             {
-                 Cursor.lockState = CursorLockMode.Locked;
-                 Cursor.visible = false;
+                bool shouldPant = _stamina < (MaxStamina * 0.5f);
+                SoundManager.Instance.SetPantingSound(shouldPant);
             }
+            // ---------------------------------
         }
 
         public async void StartGame(GameMode game, byte[] connectionToken = null)

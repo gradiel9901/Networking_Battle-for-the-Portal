@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Com.MyCompany.MyGame
 {
+    // shows the death screen + countdown when the local player dies
     public class DeathUIManager : MonoBehaviour
     {
         [Header("UI References")]
@@ -10,10 +11,12 @@ namespace Com.MyCompany.MyGame
         [SerializeField] private UnityEngine.UI.Button spectateButton;
         [SerializeField] private TextMeshProUGUI countdownText;
 
+        // singleton so other scripts can get to this easily
         public static DeathUIManager Instance;
 
         private void Awake()
         {
+            // make sure only one of these exists
             if (Instance == null)
             {
                 Instance = this;
@@ -35,6 +38,7 @@ namespace Com.MyCompany.MyGame
             if (Network.NetworkPlayer.Local != null)
                 Network.NetworkPlayer.Local.SpectateNextPlayer();
 
+            // hide the death panel when spectating
             ToggleDeathScreen(false);
         }
 
@@ -43,13 +47,15 @@ namespace Com.MyCompany.MyGame
             if (deathPanel != null)
                 deathPanel.SetActive(show);
 
-if (!show && countdownText != null)
+            // clear the countdown text when hiding
+            if (!show && countdownText != null)
                 countdownText.text = "";
         }
 
         public void UpdateCountdown(int seconds)
         {
             if (countdownText == null) return;
+            // show empty string when the timer hits 0
             countdownText.text = seconds > 0 ? $"Respawning in {seconds}..." : "";
         }
     }

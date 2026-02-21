@@ -3,6 +3,7 @@ using Network;
 using TMPro;
 using UnityEngine;
 
+// shows a list of players who've already finished, updates every half second
 public class FinishedPlayersUI : MonoBehaviour
 {
     [Header("UI References")]
@@ -10,12 +11,13 @@ public class FinishedPlayersUI : MonoBehaviour
     [SerializeField] private string _header = "🏁 Escaped:";
 
     [Header("Settings")]
-    [SerializeField] private float _updateInterval = 0.5f;
+    [SerializeField] private float _updateInterval = 0.5f; // dont update every frame, that'd be wasteful
 
     private float _timer;
 
     private void Update()
     {
+        // only refresh the list every X seconds instead of every frame
         _timer += Time.deltaTime;
         if (_timer < _updateInterval) return;
         _timer = 0f;
@@ -33,11 +35,13 @@ public class FinishedPlayersUI : MonoBehaviour
 
         foreach (var player in allPlayers)
         {
+            // skip players who havent finished yet
             if (!player.HasFinished) continue;
             sb.AppendLine($"{rank}. {player.PlayerName}");
             rank++;
         }
 
+        // only show the header text if at least one person has finished
         if (rank > 1)
         {
             _finishedPlayersText.text = $"{_header}\n{sb}";

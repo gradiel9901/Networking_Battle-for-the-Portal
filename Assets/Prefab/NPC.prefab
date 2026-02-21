@@ -203,6 +203,7 @@ MonoBehaviour:
   _attackDamage: 10
   _contactDamage: 25
   _contactDamageInterval: 1
+  _npcSound: {fileID: 8300000, guid: 9c9b54bcc948b5d4bb90d6acff7f0b84, type: 3}
   _roamSpeed: 2
   _roamRadius: 10
   _roamWaitTime: 2
